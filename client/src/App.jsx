@@ -34,7 +34,7 @@ function App() {
       }
       if (chaveUrl) {
         try {
-          const resposta = await axios.post('http://localhost:3001/api/login', { magic_code: chaveUrl });
+          const resposta = await axios.post('https://projeto-nos-api.onrender.com/api/login', { magic_code: chaveUrl });
           if (resposta.data.success) {
             localStorage.setItem('usuario_nos', JSON.stringify(resposta.data.user));
             setUser(resposta.data.user);

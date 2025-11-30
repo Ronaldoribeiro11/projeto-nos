@@ -13,7 +13,7 @@ const Cartas = ({ user }) => {
   // 1. DEFINIR A FUNÇÃO PRIMEIRO
   const carregarCartas = async () => {
     try {
-      const res = await axios.get('http://localhost:3001/api/cartas');
+      const res = await axios.get('https://projeto-nos-api.onrender.com/api/cartas');
       if (res.data.success) setCartas(res.data.data);
     } catch (err) { console.error(err); }
   };
@@ -28,7 +28,7 @@ const Cartas = ({ user }) => {
     setLendo(carta);
     if (!carta.foi_lida) {
       try {
-        await axios.put(`http://localhost:3001/api/cartas/${carta.id}/ler`);
+        await axios.put(`https://projeto-nos-api.onrender.com/api/cartas/${carta.id}/ler`);
         // Atualiza localmente
         const novaLista = cartas.map(c => c.id === carta.id ? {...c, foi_lida: true} : c);
         setCartas(novaLista);
@@ -39,7 +39,7 @@ const Cartas = ({ user }) => {
   const enviarCarta = async () => {
     if (!novoTitulo || !novoConteudo) return alert('Escreva algo!');
     try {
-      await axios.post('http://localhost:3001/api/cartas', {
+      await axios.post('https://projeto-nos-api.onrender.com/api/cartas', {
         titulo: novoTitulo,
         conteudo: novoConteudo
       });

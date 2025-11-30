@@ -16,7 +16,7 @@ const Cofre = ({ user }) => {
 
   const carregarCofre = async () => {
     try {
-      const res = await axios.get('http://localhost:3001/api/cofre');
+      const res = await axios.get('https://projeto-nos-api.onrender.com/api/cofre');
       if (res.data.success) {
         setSaldo(parseFloat(res.data.saldo));
         setHistorico(res.data.historico);
@@ -27,7 +27,7 @@ const Cofre = ({ user }) => {
   const depositar = async (valor, desc) => {
     setLoading(true);
     try {
-      await axios.post('http://localhost:3001/api/cofre', {
+      await axios.post('https://projeto-nos-api.onrender.com/api/cofre', {
         usuario_id: user.id,
         valor: valor,
         descricao: desc

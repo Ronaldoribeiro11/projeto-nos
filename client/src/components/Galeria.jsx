@@ -14,7 +14,7 @@ const Galeria = ({ user }) => {
   // 1. DEFINIR A FUNÇÃO PRIMEIRO (Movida para cima para evitar erro)
   const carregarGaleria = async () => {
     try {
-      const res = await axios.get('http://localhost:3001/api/galeria');
+      const res = await axios.get('https://projeto-nos-api.onrender.com/api/galeria');
       if (res.data.success) setFotos(res.data.data);
     } catch (error) { console.error(error); }
     setLoading(false);
@@ -42,7 +42,7 @@ const Galeria = ({ user }) => {
     if (!novaFoto) return;
     setUploading(true);
     try {
-      await axios.post('http://localhost:3001/api/galeria', {
+      await axios.post('https://projeto-nos-api.onrender.com/api/galeria', {
         usuario_id: user.id,
         imagem: novaFoto,
         legenda,

@@ -9,7 +9,7 @@ const Metas = ({ user }) => {
   // 1. DEFINIR A FUNÇÃO PRIMEIRO (Para evitar erro de ordem)
   const carregarMapa = async () => {
     try {
-      const res = await axios.get('http://localhost:3001/api/metas');
+      const res = await axios.get('https://projeto-nos-api.onrender.com/api/metas');
       if (res.data.success) setMetas(res.data.data);
     } catch (error) { 
       console.error(error); // Usando a variável error
@@ -25,7 +25,7 @@ const Metas = ({ user }) => {
 
   const mudarStatus = async (id, novoStatus) => {
     try {
-      await axios.put(`http://localhost:3001/api/metas/${id}`, { status: novoStatus });
+      await axios.put(`https://projeto-nos-api.onrender.com/api/metas/${id}`, { status: novoStatus });
       setEditando(null);
       carregarMapa();
     } catch (error) { 
@@ -38,7 +38,7 @@ const Metas = ({ user }) => {
     const titulo = prompt("Nome da nova fase/meta:");
     if (!titulo) return;
     try {
-      await axios.post('http://localhost:3001/api/metas', { 
+      await axios.post('https://projeto-nos-api.onrender.com/api/metas', { 
         titulo, 
         ordem: metas.length + 1 
       });

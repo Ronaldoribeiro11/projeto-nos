@@ -12,10 +12,10 @@ const Gacha = ({ user }) => {
   // 1. DEFINIR A FUNÇÃO PRIMEIRO
   const atualizarDados = async () => {
     try {
-      const resSaldo = await axios.get(`http://localhost:3001/api/usuario/${user.id}/saldo`);
+      const resSaldo = await axios.get(`https://projeto-nos-api.onrender.com/api/usuario/${user.id}/saldo`);
       if (resSaldo.data.success) setMoedas(resSaldo.data.moedas);
       
-      const resInv = await axios.get(`http://localhost:3001/api/gacha/inventario/${user.id}`);
+      const resInv = await axios.get(`https://projeto-nos-api.onrender.com/api/gacha/inventario/${user.id}`);
       if (resInv.data.success) setInventario(resInv.data.data);
     } catch (error) { console.error(error); }
   };
@@ -29,7 +29,7 @@ const Gacha = ({ user }) => {
   const girar = async () => {
     setLoading(true);
     try {
-      const res = await axios.post('http://localhost:3001/api/gacha/girar', { usuario_id: user.id });
+      const res = await axios.post('https://projeto-nos-api.onrender.com/api/gacha/girar', { usuario_id: user.id });
       
       if (!res.data.success) {
         alert(res.data.message);
@@ -55,7 +55,7 @@ const Gacha = ({ user }) => {
   const usarPremio = async (id) => {
     if(!window.confirm("Quer gastar esse vale agora? Ele vai sumir!")) return;
     try {
-      await axios.put(`http://localhost:3001/api/gacha/usar/${id}`);
+      await axios.put(`https://projeto-nos-api.onrender.com/api/gacha/usar/${id}`);
       alert("Vale resgatado! Mostre a tela pro seu amor.");
       atualizarDados();
     } catch (error) { 
