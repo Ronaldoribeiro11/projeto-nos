@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios'; // Reativado para conectar de verdade!
+import axios from 'axios'; // Mantemos axios para os outros apps (Jardim, etc)
 import Pulso from './components/Pulso';
 import MenuApps from './components/MenuApps'; 
 
@@ -21,9 +21,9 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState('home'); 
   
-  // --- LÓGICA DE LOGIN REAL (CONECTADA) ---
+  // --- LÓGICA DE LOGIN GARANTIDA (SEM SERVIDOR) ---
   useEffect(() => {
-    const realizarLogin = async () => {
+    const realizarLogin = () => {
         // 1. Verifica se já tem login salvo no navegador
         const usuarioSalvo = localStorage.getItem('usuario_nos');
         if (usuarioSalvo) {
@@ -32,29 +32,27 @@ function App() {
             return;
         }
 
-        // 2. Verifica se tem a chave na URL (?chave=amor)
+        // 2. Verifica a chave na URL LOCALMENTE
         const params = new URLSearchParams(window.location.search);
         const chaveUrl = params.get('chave');
 
-        if (chaveUrl) {
-            try {
-                // Tenta conectar no servidor (usando o caminho relativo /api para evitar CORS)
-                const resposta = await axios.post('/api/login', { magic_code: chaveUrl });
-                
-                if (resposta.data.success) {
-                    // Sucesso! Salva e libera o acesso
-                    localStorage.setItem('usuario_nos', JSON.stringify(resposta.data.user));
-                    setUser(resposta.data.user);
-                    // Limpa a URL para ficar bonitinho
-                    window.history.replaceState({}, document.title, "/");
-                }
-            } catch (error) {
-                console.error("Erro ao conectar:", error);
-                // Se der erro, o usuário continua null e cai na tela de bloqueio
-            }
+        // SE A CHAVE FOR "amor", ENTRA DIRETO!
+        if (chaveUrl === 'amor') {
+            // Criamos o usuário manualmente, ignorando o servidor
+            const usuarioEla = { 
+                id: 1, 
+                nome: 'Ela', 
+                papel: 'user',
+                magic_code: 'amor'
+            };
+            
+            localStorage.setItem('usuario_nos', JSON.stringify(usuarioEla));
+            setUser(usuarioEla);
+            
+            // Limpa a URL para ficar bonito
+            window.history.replaceState({}, document.title, "/");
         }
         
-        // Finaliza o carregamento (seja sucesso ou falha)
         setLoading(false);
     };
 
@@ -62,12 +60,13 @@ function App() {
   }, []);
 
   // Telas de Carregamento e Bloqueio
-  if (loading) return <div className="min-h-screen bg-yami-dark flex items-center justify-center animate-pulse text-kawaii-pink">❤️ Conectando...</div>;
+  if (loading) return <div className="min-h-screen bg-yami-dark flex items-center justify-center animate-pulse text-kawaii-pink">❤️ Verificando...</div>;
   
   if (!user) return (
     <div className="min-h-screen bg-yami-dark flex flex-col items-center justify-center text-white space-y-4">
         <div className="text-6xl animate-bounce">🔒</div>
         <p className="text-gray-400 text-sm">Acesso Restrito</p>
+        <p className="text-xs text-gray-600">Use o link correto com a chave.</p>
     </div>
   );
 
@@ -131,7 +130,6 @@ const HomeContent = () => {
     const [tempo, setTempo] = useState({ anos:0, meses:0, semanas:0, dias:0, horas:0, minutos:0, segundos:0 });
     const [bio, setBio] = useState({ sangue:0, celulas:0 });
     
-    // CORREÇÃO: Coloquei a data dentro do useEffect para o ESLint não reclamar
     useEffect(() => {
         const DATA_INICIO = new Date(2025, 8, 22, 21, 47, 0).getTime();
 
@@ -156,7 +154,7 @@ const HomeContent = () => {
             });
         }, 1000);
         return () => clearInterval(timer);
-    }, []); // Array vazio, roda só ao montar
+    }, []); 
 
     return (
         <div className="flex flex-col items-center text-center space-y-6 p-6 h-full overflow-y-auto scrollbar-hide animate-fade-in">
