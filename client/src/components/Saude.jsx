@@ -22,7 +22,7 @@ const Saude = ({ user }) => {
     if (tipo === 'sintoma') setParteSelecionada(detalhe);
     
     try {
-      await axios.post('https://projeto-nos-api.onrender.com/api/saude', {
+      await axios.post('http://localhost:3001/api/saude', {
         usuario_id: user.id,
         tipo, detalhe, intensidade
       });

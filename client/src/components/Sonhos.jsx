@@ -14,7 +14,7 @@ const Sonhos = ({ user }) => {
 
   const carregarBau = async () => {
     try {
-      const res = await axios.get(`https://projeto-nos-api.onrender.com/api/sonhos/${user.id}`);
+      const res = await axios.get(`http://localhost:3001/api/sonhos/${user.id}`);
       if (res.data.success) setBau(res.data.data);
     } catch (error) { console.error(error); }
   };
@@ -23,7 +23,7 @@ const Sonhos = ({ user }) => {
   const guardarSonho = async () => {
     if (!texto) return;
     try {
-      await axios.post('https://projeto-nos-api.onrender.com/api/sonhos', {
+      await axios.post('http://localhost:3001/api/sonhos', {
         usuario_id: user.id,
         texto,
         tipo: 'bom'
@@ -43,7 +43,7 @@ const Sonhos = ({ user }) => {
 
     // 2. Salva no banco (para você saber que ela teve pesadelo), mas para ela "sumiu"
     try {
-      await axios.post('https://projeto-nos-api.onrender.com/api/sonhos', {
+      await axios.post('http://localhost:3001/api/sonhos', {
         usuario_id: user.id,
         texto,
         tipo: 'pesadelo'

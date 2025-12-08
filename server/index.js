@@ -1,15 +1,39 @@
 require('dotenv').config(); // Carrega o arquivo .env
 const express = require('express');
-const cors = require('cors');
 const pool = require('./db');
 const cloudinary = require('cloudinary').v2; // Importa Cloudinary
 
 const app = express();
 
-// Configuração para aceitar dados grandes (necessário para o upload de fotos)
+// =======================================================================
+// 🛡️ CORREÇÃO DEFINITIVA DE CORS (MANUAL)
+// =======================================================================
+// Ao invés de usar o pacote 'cors', vamos forçar os cabeçalhos na mão.
+// Isso garante que o Render responda o 'preflight' (OPTIONS) corretamente.
+
+app.use((req, res, next) => {
+    // 1. Libera para qualquer site (Vercel, Localhost, Celular)
+    res.header("Access-Control-Allow-Origin", "*");
+    
+    // 2. Libera os métodos que usamos
+    res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+    
+    // 3. Libera os cabeçalhos que o Axios manda
+    res.header("Access-Control-Allow-Headers", "Content-Type, Authorization, Content-Length, X-Requested-With, Accept");
+    
+    // 4. O PULO DO GATO: Se o navegador perguntar "Posso entrar?" (OPTIONS),
+    // a gente responde "SIM" (200) na hora, sem processar mais nada.
+    if (req.method === 'OPTIONS') {
+        return res.sendStatus(200);
+    }
+    
+    next();
+});
+// =======================================================================
+
+// Configuração para aceitar dados grandes
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
-app.use(cors());
 
 // --- CONFIGURAÇÃO DO CLOUDINARY ---
 cloudinary.config({
@@ -27,11 +51,16 @@ app.get('/', (req, res) => {
 // ROTA 1: LOGIN MÁGICO
 app.post('/api/login', async (req, res) => {
   const { magic_code } = req.body;
+  // Log para ver no painel do Render se a requisição chegou
+  console.log('Tentativa de login recebida:', magic_code); 
   try {
     const result = await pool.query('SELECT * FROM usuarios WHERE magic_code = $1', [magic_code]);
     if (result.rows.length > 0) res.json({ success: true, user: result.rows[0] });
     else res.status(401).json({ success: false, message: 'Código inválido' });
-  } catch (err) { res.status(500).json({ error: err.message }); }
+  } catch (err) { 
+      console.error('Erro Critico no Banco:', err);
+      res.status(500).json({ error: err.message }); 
+  }
 });
 
 // ROTA 2: JARDIM (Salvar)
@@ -211,7 +240,6 @@ app.post('/api/arcade/ganhar', async (req, res) => {
 
     // Verifica se mudou o dia
     const hoje = new Date().toISOString().split('T')[0];
-    // Se user.ultimo_dia_game for null (primeira vez), usa uma data antiga
     const dataBanco = user.ultimo_dia_game ? new Date(user.ultimo_dia_game).toISOString().split('T')[0] : '2000-01-01';
     
     let moedasHoje = user.moedas_hoje;
@@ -327,21 +355,21 @@ app.post('/api/gacha/girar', async (req, res) => {
 
 // LISTAR INVENTÁRIO
 app.get('/api/gacha/inventario/:usuario_id', async (req, res) => {
-  try {
-    const result = await pool.query('SELECT * FROM premios WHERE usuario_id = $1 ORDER BY status ASC, data_ganho DESC', [req.params.usuario_id]);
-    res.json({ success: true, data: result.rows });
-  } catch (err) { res.status(500).json({ error: 'Erro inventario' }); }
+  try {
+    const result = await pool.query('SELECT * FROM premios WHERE usuario_id = $1 ORDER BY status ASC, data_ganho DESC', [req.params.usuario_id]);
+    res.json({ success: true, data: result.rows });
+  } catch (err) { res.status(500).json({ error: 'Erro inventario' }); }
 });
 
 // USAR PRÊMIO
 app.put('/api/gacha/usar/:id', async (req, res) => {
-  try {
-    await pool.query("UPDATE premios SET status = 'usado' WHERE id = $1", [req.params.id]);
-    res.json({ success: true });
-  } catch (err) { res.status(500).json({ error: 'Erro ao usar' }); }
+  try {
+    await pool.query("UPDATE premios SET status = 'usado' WHERE id = $1", [req.params.id]);
+    res.json({ success: true });
+  } catch (err) { res.status(500).json({ error: 'Erro ao usar' }); }
 });
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
-  console.log(`🚀 Servidor FINAL rodando na porta ${PORT}!`);
+  console.log(`🚀 Servidor FINAL rodando na porta ${PORT}!`);
 });

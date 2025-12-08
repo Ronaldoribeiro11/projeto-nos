@@ -19,7 +19,7 @@ const Jardim = ({ user }) => {
   // 1. Função de carregar (definida antes de usar)
   const carregarJardim = async () => {
     try {
-      const res = await axios.get(`https://projeto-nos-api.onrender.com/api/diario/${user.id}`);
+      const res = await axios.get(`http://localhost:3001/api/diario/${user.id}`);
       if (res.data.success) setHistorico(res.data.data);
     } catch (error) {
       console.error("Erro ao carregar jardim:", error);
@@ -36,7 +36,7 @@ const Jardim = ({ user }) => {
     if (!humor) return alert('Escolha como se sente!');
     setLoading(true);
     try {
-      await axios.post('https://projeto-nos-api.onrender.com/api/diario', {
+      await axios.post('http://localhost:3001/api/diario', {
         usuario_id: user.id,
         humor,
         nota

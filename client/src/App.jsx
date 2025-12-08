@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+// REMOVIDO: import axios from 'axios'; // Não precisamos mais dele neste modo
 import Pulso from './components/Pulso';
 import MenuApps from './components/MenuApps'; 
 
@@ -13,42 +13,29 @@ import Ciclo from './components/Ciclo';
 import Cofre from './components/Cofre';
 import Metas from './components/Metas';
 import Galeria from './components/Galeria';
-import Gacha from './components/Gacha';   // <--- Gacha da Sorte
+import Gacha from './components/Gacha';
+import Arcade from './components/Arcade';
 
 function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState('home'); 
   
-  // --- LÓGICA DE LOGIN ---
+  // --- LÓGICA DE LOGIN (BYPASS DE DEBUG ATIVADO!) ---
   useEffect(() => {
-    const verificarAcesso = async () => {
-      const params = new URLSearchParams(window.location.search);
-      const chaveUrl = params.get('chave');
-      const usuarioSalvo = localStorage.getItem('usuario_nos');
-
-      if (usuarioSalvo) {
-        setUser(JSON.parse(usuarioSalvo));
+    setTimeout(() => {
+        const usuarioSalvo = localStorage.getItem('usuario_nos');
+        if (usuarioSalvo) {
+            setUser(JSON.parse(usuarioSalvo));
+        } else {
+            setUser({ id: 1, nome: 'Ela', papel: 'user' });
+        }
         setLoading(false);
-        return;
-      }
-      if (chaveUrl) {
-        try {
-          const resposta = await axios.post('https://projeto-nos-api.onrender.com/api/login', { magic_code: chaveUrl });
-          if (resposta.data.success) {
-            localStorage.setItem('usuario_nos', JSON.stringify(resposta.data.user));
-            setUser(resposta.data.user);
-            window.history.replaceState({}, document.title, "/");
-          }
-        } catch (error) { console.error(error); }
-      }
-      setLoading(false);
-    };
-    verificarAcesso();
+    }, 500); 
   }, []);
 
-  if (loading) return <div className="min-h-screen bg-yami-dark flex items-center justify-center animate-pulse text-kawaii-pink">❤️</div>;
-  if (!user) return <div className="min-h-screen bg-yami-dark flex items-center justify-center text-4xl">🔒</div>;
+  if (loading) return <div className="min-h-screen bg-yami-dark flex items-center justify-center animate-pulse text-kawaii-pink">DEBUG: Carregando UI...</div>;
+  if (!user) return <div className="min-h-screen bg-yami-dark flex items-center justify-center text-4xl">❌ Falha Crítica</div>; 
 
   return (
     <div className="min-h-screen bg-yami-dark text-white relative overflow-hidden font-body flex justify-center">
@@ -73,7 +60,7 @@ function App() {
             {tab === 'home' && <HomeContent />}
             {tab === 'menu' && <MenuApps setTab={setTab} />}
             
-            {/* 2. FUNCIONALIDADES (TODAS IMPLEMENTADAS) */}
+            {/* 2. FUNCIONALIDADES (TODAS ATIVAS) */}
             {tab === 'jardim' && <Jardim user={user} />}
             {tab === 'saude' && <Saude user={user} />}
             {tab === 'cartas' && <Cartas user={user} />}
@@ -83,7 +70,7 @@ function App() {
             {tab === 'metas' && <Metas user={user} />}
             {tab === 'fotos' && <Galeria user={user} />}
             {tab === 'gacha' && <Gacha user={user} />}
-            
+            {tab === 'arcade' && <Arcade user={user} />}
             
             {/* 3. SEGURANÇA */}
             {tab === 'sos' && <SalaPanico />}
@@ -93,24 +80,9 @@ function App() {
         {/* RODAPÉ SIMPLIFICADO */}
         <footer className="p-6 pt-2 shrink-0">
             <div className="bg-yami-gray/90 backdrop-blur-xl rounded-2xl p-2 border border-white/10 shadow-2xl flex justify-around items-center">
-                <button 
-                    onClick={() => setTab('menu')} 
-                    className={`p-3 text-2xl transition hover:scale-110 ${tab === 'menu' ? 'text-kawaii-purple scale-110' : 'text-gray-400'}`}
-                >
-                    📱
-                </button>
-                <button 
-                    onClick={() => setTab('home')} 
-                    className={`p-3 text-2xl transition hover:scale-110 ${tab === 'home' ? 'text-kawaii-pink scale-125' : 'text-gray-400'}`}
-                >
-                    🏠
-                </button>
-                <button 
-                    onClick={() => setTab('sos')} 
-                    className={`p-3 text-2xl transition hover:scale-110 ${tab === 'sos' ? 'text-red-500 animate-pulse' : 'text-red-900'}`}
-                >
-                    🚨
-                </button>
+                <button onClick={() => setTab('menu')} className={`p-3 text-2xl transition hover:scale-110 ${tab === 'menu' ? 'text-kawaii-purple scale-110' : 'text-gray-400'}`}>📱</button>
+                <button onClick={() => setTab('home')} className={`p-3 text-2xl transition hover:scale-110 ${tab === 'home' ? 'text-kawaii-pink scale-125' : 'text-gray-400'}`}>🏠</button>
+                <button onClick={() => setTab('sos')} className={`p-3 text-2xl transition hover:scale-110 ${tab === 'sos' ? 'text-red-500 animate-pulse' : 'text-red-900'}`}>🚨</button>
             </div>
         </footer>
 
@@ -147,7 +119,7 @@ const HomeContent = () => {
             });
         }, 1000);
         return () => clearInterval(timer);
-    }, []);
+    }, [DATA_INICIO]); // <--- CORREÇÃO AQUI (Adicionado DATA_INICIO)
 
     return (
         <div className="flex flex-col items-center text-center space-y-6 p-6 h-full overflow-y-auto scrollbar-hide animate-fade-in">
