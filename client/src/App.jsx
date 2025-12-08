@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-// REMOVIDO: import axios from 'axios'; // Não precisamos mais dele neste modo
+import axios from 'axios'; // Reativado para conectar de verdade!
 import Pulso from './components/Pulso';
 import MenuApps from './components/MenuApps'; 
 
-// --- APPS PRONTOS (LISTA COMPLETA) ---
+// --- APPS PRONTOS ---
 import Jardim from './components/Jardim';
 import Saude from './components/Saude';
 import Cartas from './components/Cartas';
@@ -21,22 +21,57 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState('home'); 
   
-  // --- LÓGICA DE LOGIN (BYPASS DE DEBUG ATIVADO!) ---
+  // --- LÓGICA DE LOGIN REAL (CONECTADA) ---
   useEffect(() => {
-    setTimeout(() => {
+    const realizarLogin = async () => {
+        // 1. Verifica se já tem login salvo no navegador
         const usuarioSalvo = localStorage.getItem('usuario_nos');
         if (usuarioSalvo) {
             setUser(JSON.parse(usuarioSalvo));
-        } else {
-            setUser({ id: 1, nome: 'Ela', papel: 'user' });
+            setLoading(false);
+            return;
         }
+
+        // 2. Verifica se tem a chave na URL (?chave=amor)
+        const params = new URLSearchParams(window.location.search);
+        const chaveUrl = params.get('chave');
+
+        if (chaveUrl) {
+            try {
+                // Tenta conectar no servidor (usando o caminho relativo /api para evitar CORS)
+                const resposta = await axios.post('/api/login', { magic_code: chaveUrl });
+                
+                if (resposta.data.success) {
+                    // Sucesso! Salva e libera o acesso
+                    localStorage.setItem('usuario_nos', JSON.stringify(resposta.data.user));
+                    setUser(resposta.data.user);
+                    // Limpa a URL para ficar bonitinho
+                    window.history.replaceState({}, document.title, "/");
+                }
+            } catch (error) {
+                console.error("Erro ao conectar:", error);
+                // Se der erro, o usuário continua null e cai na tela de bloqueio
+            }
+        }
+        
+        // Finaliza o carregamento (seja sucesso ou falha)
         setLoading(false);
-    }, 500); 
+    };
+
+    realizarLogin();
   }, []);
 
-  if (loading) return <div className="min-h-screen bg-yami-dark flex items-center justify-center animate-pulse text-kawaii-pink">DEBUG: Carregando UI...</div>;
-  if (!user) return <div className="min-h-screen bg-yami-dark flex items-center justify-center text-4xl">❌ Falha Crítica</div>; 
+  // Telas de Carregamento e Bloqueio
+  if (loading) return <div className="min-h-screen bg-yami-dark flex items-center justify-center animate-pulse text-kawaii-pink">❤️ Conectando...</div>;
+  
+  if (!user) return (
+    <div className="min-h-screen bg-yami-dark flex flex-col items-center justify-center text-white space-y-4">
+        <div className="text-6xl animate-bounce">🔒</div>
+        <p className="text-gray-400 text-sm">Acesso Restrito</p>
+    </div>
+  );
 
+  // --- ÁREA LOGADA ---
   return (
     <div className="min-h-screen bg-yami-dark text-white relative overflow-hidden font-body flex justify-center">
       
@@ -60,7 +95,7 @@ function App() {
             {tab === 'home' && <HomeContent />}
             {tab === 'menu' && <MenuApps setTab={setTab} />}
             
-            {/* 2. FUNCIONALIDADES (TODAS ATIVAS) */}
+            {/* 2. FUNCIONALIDADES */}
             {tab === 'jardim' && <Jardim user={user} />}
             {tab === 'saude' && <Saude user={user} />}
             {tab === 'cartas' && <Cartas user={user} />}
@@ -95,9 +130,11 @@ function App() {
 const HomeContent = () => {
     const [tempo, setTempo] = useState({ anos:0, meses:0, semanas:0, dias:0, horas:0, minutos:0, segundos:0 });
     const [bio, setBio] = useState({ sangue:0, celulas:0 });
-    const DATA_INICIO = new Date(2025, 8, 22, 21, 47, 0).getTime();
-
+    
+    // CORREÇÃO: Coloquei a data dentro do useEffect para o ESLint não reclamar
     useEffect(() => {
+        const DATA_INICIO = new Date(2025, 8, 22, 21, 47, 0).getTime();
+
         const timer = setInterval(() => {
             const agora = new Date().getTime();
             const diferenca = agora - DATA_INICIO;
@@ -119,7 +156,7 @@ const HomeContent = () => {
             });
         }, 1000);
         return () => clearInterval(timer);
-    }, [DATA_INICIO]); // <--- CORREÇÃO AQUI (Adicionado DATA_INICIO)
+    }, []); // Array vazio, roda só ao montar
 
     return (
         <div className="flex flex-col items-center text-center space-y-6 p-6 h-full overflow-y-auto scrollbar-hide animate-fade-in">

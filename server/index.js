@@ -31,7 +31,7 @@ app.use((req, res, next) => {
 });
 // =======================================================================
 
-// Configuração para aceitar dados grandes
+// Configuração para aceitar dados grandes (necessário para o upload de fotos)
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
@@ -229,7 +229,7 @@ app.get('/api/galeria', async (req, res) => {
   } catch (err) { console.error(err); res.status(500).json({ error: 'Erro ao buscar fotos' }); }
 });
 
-// =================== ROTA 11: ARCADE & GACHA (NOVO) ===================
+// =================== ROTA 11: ARCADE & GACHA ===================
 
 // GANHAR MOEDAS (Limite 5/dia)
 app.post('/api/arcade/ganhar', async (req, res) => {
@@ -292,7 +292,7 @@ app.post('/api/gacha/girar', async (req, res) => {
       await pool.query('UPDATE usuarios SET moedas = moedas - $1 WHERE id = $2', [CUSTO_GIRO, usuario_id]);
     }
 
-    // 2. LISTA DE 40 PRÊMIOS (20 Fofos / 20 Safados)
+    // 2. LISTA DE PRÊMIOS PERSONALIZADA
     const premiosPossiveis = [
       // FOFOS
       { nome: 'Vale Massagem Relaxante', tipo: 'vale' },
@@ -316,7 +316,7 @@ app.post('/api/gacha/girar', async (req, res) => {
       { nome: 'Um elogio sincero a cada hora', tipo: 'vale' },
       { nome: 'Beijos na testa o dia todo', tipo: 'vale' },
 
-      // SAFADOS
+      // SAFADOS (LISTA ESPECIAL)
       { nome: 'Vale Dedada Caprichada', tipo: 'safado' },
       { nome: 'Oral até as pernas tremerem', tipo: 'safado' },
       { nome: 'Massagem no corpo todo (+18)', tipo: 'safado' },
@@ -355,21 +355,21 @@ app.post('/api/gacha/girar', async (req, res) => {
 
 // LISTAR INVENTÁRIO
 app.get('/api/gacha/inventario/:usuario_id', async (req, res) => {
-  try {
-    const result = await pool.query('SELECT * FROM premios WHERE usuario_id = $1 ORDER BY status ASC, data_ganho DESC', [req.params.usuario_id]);
-    res.json({ success: true, data: result.rows });
-  } catch (err) { res.status(500).json({ error: 'Erro inventario' }); }
+  try {
+    const result = await pool.query('SELECT * FROM premios WHERE usuario_id = $1 ORDER BY status ASC, data_ganho DESC', [req.params.usuario_id]);
+    res.json({ success: true, data: result.rows });
+  } catch (err) { res.status(500).json({ error: 'Erro inventario' }); }
 });
 
 // USAR PRÊMIO
 app.put('/api/gacha/usar/:id', async (req, res) => {
-  try {
-    await pool.query("UPDATE premios SET status = 'usado' WHERE id = $1", [req.params.id]);
-    res.json({ success: true });
-  } catch (err) { res.status(500).json({ error: 'Erro ao usar' }); }
+  try {
+    await pool.query("UPDATE premios SET status = 'usado' WHERE id = $1", [req.params.id]);
+    res.json({ success: true });
+  } catch (err) { res.status(500).json({ error: 'Erro ao usar' }); }
 });
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
-  console.log(`🚀 Servidor FINAL rodando na porta ${PORT}!`);
+  console.log(`🚀 Servidor FINAL rodando na porta ${PORT}!`);
 });
