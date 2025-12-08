@@ -22,7 +22,8 @@ const Saude = ({ user }) => {
     if (tipo === 'sintoma') setParteSelecionada(detalhe);
     
     try {
-      await axios.post('http://localhost:3001/api/saude', {
+      // CORREÇÃO: Caminho relativo /api
+      await axios.post('/api/saude', {
         usuario_id: user.id,
         tipo, detalhe, intensidade
       });

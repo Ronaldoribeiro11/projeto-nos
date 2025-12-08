@@ -6,15 +6,16 @@ const Metas = ({ user }) => {
   const [loading, setLoading] = useState(true);
   const [editando, setEditando] = useState(null); // Para o Admin mudar status
 
-  // 1. DEFINIR A FUNÇÃO PRIMEIRO (Para evitar erro de ordem)
+  // 1. DEFINIR A FUNÇÃO PRIMEIRO
   const carregarMapa = async () => {
     try {
-      const res = await axios.get('http://localhost:3001/api/metas');
+      // CORREÇÃO: Caminho relativo /api
+      const res = await axios.get('/api/metas');
       if (res.data.success) setMetas(res.data.data);
     } catch (error) { 
-      console.error(error); // Usando a variável error
+      console.error(error); 
     }
-    setLoading(false); // Usando a variável loading
+    setLoading(false); 
   };
 
   // 2. CHAMAR A FUNÇÃO DEPOIS
@@ -25,7 +26,8 @@ const Metas = ({ user }) => {
 
   const mudarStatus = async (id, novoStatus) => {
     try {
-      await axios.put(`http://localhost:3001/api/metas/${id}`, { status: novoStatus });
+      // CORREÇÃO: Caminho relativo /api
+      await axios.put(`/api/metas/${id}`, { status: novoStatus });
       setEditando(null);
       carregarMapa();
     } catch (error) { 
@@ -38,7 +40,8 @@ const Metas = ({ user }) => {
     const titulo = prompt("Nome da nova fase/meta:");
     if (!titulo) return;
     try {
-      await axios.post('http://localhost:3001/api/metas', { 
+      // CORREÇÃO: Caminho relativo /api
+      await axios.post('/api/metas', { 
         titulo, 
         ordem: metas.length + 1 
       });
@@ -63,7 +66,7 @@ const Metas = ({ user }) => {
     return 'bg-gray-700 border-gray-600 text-gray-400 grayscale';
   };
 
-  // 3. TELA DE CARREGAMENTO (Usa a variável loading)
+  // 3. TELA DE CARREGAMENTO
   if (loading) {
     return (
         <div className="w-full h-full flex items-center justify-center text-blue-400 animate-pulse">
@@ -91,7 +94,6 @@ const Metas = ({ user }) => {
         
         {/* Linha do Caminho (SVG no fundo) */}
         <svg className="absolute top-4 left-0 w-full h-full pointer-events-none" style={{ zIndex: 0 }}>
-            {/* Desenha uma linha conectando os pontos */}
             <path 
                 d="M 160 20 Q 250 80 160 140 Q 70 200 160 260 Q 250 320 160 380 Q 70 440 160 500" 
                 fill="none" 

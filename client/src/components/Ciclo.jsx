@@ -14,7 +14,8 @@ const Ciclo = ({ user }) => {
 
   const carregarCiclo = async () => {
     try {
-      const res = await axios.get(`http://localhost:3001/api/ciclo/${user.id}`);
+      // CORREÇÃO: Caminho relativo /api
+      const res = await axios.get(`/api/ciclo/${user.id}`);
       if (res.data.success) {
         setCiclo(res.data.data);
       }
@@ -33,7 +34,8 @@ const Ciclo = ({ user }) => {
     const dataHoje = new Date().toLocaleDateString('en-CA'); // Formato YYYY-MM-DD
 
     try {
-      await axios.post('http://localhost:3001/api/ciclo', {
+      // CORREÇÃO: Caminho relativo /api
+      await axios.post('/api/ciclo', {
         usuario_id: user.id,
         data_ultima: dataHoje,
         duracao: 28 // Padrão de 28 dias

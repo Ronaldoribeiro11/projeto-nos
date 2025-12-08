@@ -11,10 +11,11 @@ const Galeria = ({ user }) => {
   const [legenda, setLegenda] = useState('');
   const [dataFoto, setDataFoto] = useState(new Date().toISOString().split('T')[0]);
 
-  // 1. DEFINIR A FUNÇÃO PRIMEIRO (Movida para cima para evitar erro)
+  // 1. DEFINIR A FUNÇÃO PRIMEIRO
   const carregarGaleria = async () => {
     try {
-      const res = await axios.get('http://localhost:3001/api/galeria');
+      // CORREÇÃO: Caminho relativo /api
+      const res = await axios.get('/api/galeria');
       if (res.data.success) setFotos(res.data.data);
     } catch (error) { console.error(error); }
     setLoading(false);
@@ -42,7 +43,8 @@ const Galeria = ({ user }) => {
     if (!novaFoto) return;
     setUploading(true);
     try {
-      await axios.post('http://localhost:3001/api/galeria', {
+      // CORREÇÃO: Caminho relativo /api
+      await axios.post('/api/galeria', {
         usuario_id: user.id,
         imagem: novaFoto,
         legenda,
@@ -106,7 +108,7 @@ const Galeria = ({ user }) => {
         )}
       </div>
 
-      {/* GRADE DE FOTOS (Corrigida para altura automática) */}
+      {/* GRADE DE FOTOS */}
       <div className="grid grid-cols-2 gap-3 pb-20 items-start">
         {fotos.map((foto) => (
             <div key={foto.id} className="relative group break-inside-avoid rounded-xl overflow-hidden border border-white/10 bg-gray-800">
@@ -117,7 +119,7 @@ const Galeria = ({ user }) => {
                     loading="lazy"
                 />
                 
-                {/* Overlay com legenda (aparece ao clicar ou passar mouse) */}
+                {/* Overlay com legenda */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-3">
                     <p className="text-white text-xs font-bold line-clamp-2">{foto.legenda}</p>
                     <p className="text-[9px] text-gray-400 mt-1">{new Date(foto.data_foto).toLocaleDateString('pt-BR')}</p>

@@ -19,7 +19,8 @@ const Jardim = ({ user }) => {
   // 1. Função de carregar (definida antes de usar)
   const carregarJardim = async () => {
     try {
-      const res = await axios.get(`http://localhost:3001/api/diario/${user.id}`);
+      // CORREÇÃO: Usar caminho relativo /api (O Vercel manda pro Render)
+      const res = await axios.get(`/api/diario/${user.id}`);
       if (res.data.success) setHistorico(res.data.data);
     } catch (error) {
       console.error("Erro ao carregar jardim:", error);
@@ -36,7 +37,8 @@ const Jardim = ({ user }) => {
     if (!humor) return alert('Escolha como se sente!');
     setLoading(true);
     try {
-      await axios.post('http://localhost:3001/api/diario', {
+      // CORREÇÃO: Usar caminho relativo /api
+      await axios.post('/api/diario', {
         usuario_id: user.id,
         humor,
         nota
@@ -46,7 +48,6 @@ const Jardim = ({ user }) => {
       setNota('');
       carregarJardim();
     } catch (error) {
-      // AQUI ESTAVA O ERRO: Agora usamos a variável 'error'
       console.error("Erro ao plantar:", error);
       alert('Erro ao plantar :/');
     }

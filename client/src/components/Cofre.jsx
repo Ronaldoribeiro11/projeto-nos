@@ -16,7 +16,8 @@ const Cofre = ({ user }) => {
 
   const carregarCofre = async () => {
     try {
-      const res = await axios.get('http://localhost:3001/api/cofre');
+      // CORREÇÃO: Caminho relativo /api
+      const res = await axios.get('/api/cofre');
       if (res.data.success) {
         setSaldo(parseFloat(res.data.saldo));
         setHistorico(res.data.historico);
@@ -27,7 +28,8 @@ const Cofre = ({ user }) => {
   const depositar = async (valor, desc) => {
     setLoading(true);
     try {
-      await axios.post('http://localhost:3001/api/cofre', {
+      // CORREÇÃO: Caminho relativo /api
+      await axios.post('/api/cofre', {
         usuario_id: user.id,
         valor: valor,
         descricao: desc

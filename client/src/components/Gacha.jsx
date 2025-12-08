@@ -12,10 +12,12 @@ const Gacha = ({ user }) => {
   // 1. DEFINIR A FUNÇÃO PRIMEIRO
   const atualizarDados = async () => {
     try {
-      const resSaldo = await axios.get(`http://localhost:3001/api/usuario/${user.id}/saldo`);
+      // CORREÇÃO: Usar caminho relativo /api (o Vercel manda pro Render)
+      const resSaldo = await axios.get(`/api/usuario/${user.id}/saldo`);
       if (resSaldo.data.success) setMoedas(resSaldo.data.moedas);
       
-      const resInv = await axios.get(`http://localhost:3001/api/gacha/inventario/${user.id}`);
+      // CORREÇÃO: Usar caminho relativo /api
+      const resInv = await axios.get(`/api/gacha/inventario/${user.id}`);
       if (resInv.data.success) setInventario(resInv.data.data);
     } catch (error) { console.error(error); }
   };
@@ -29,7 +31,8 @@ const Gacha = ({ user }) => {
   const girar = async () => {
     setLoading(true);
     try {
-      const res = await axios.post('http://localhost:3001/api/gacha/girar', { usuario_id: user.id });
+      // CORREÇÃO: Usar caminho relativo /api
+      const res = await axios.post('/api/gacha/girar', { usuario_id: user.id });
       
       if (!res.data.success) {
         alert(res.data.message);
@@ -46,7 +49,7 @@ const Gacha = ({ user }) => {
       }, 3000); // 3 segundos de suspense
 
     } catch (error) { 
-      console.error(error); // <--- CORREÇÃO AQUI (Usando a variável error)
+      console.error(error); 
       alert('Erro ao girar'); 
     }
     setLoading(false);
@@ -55,11 +58,12 @@ const Gacha = ({ user }) => {
   const usarPremio = async (id) => {
     if(!window.confirm("Quer gastar esse vale agora? Ele vai sumir!")) return;
     try {
-      await axios.put(`http://localhost:3001/api/gacha/usar/${id}`);
+      // CORREÇÃO: Usar caminho relativo /api
+      await axios.put(`/api/gacha/usar/${id}`);
       alert("Vale resgatado! Mostre a tela pro seu amor.");
       atualizarDados();
     } catch (error) { 
-      console.error(error); // <--- CORREÇÃO AQUI (Usando a variável error)
+      console.error(error); 
       alert('Erro ao usar'); 
     }
   };

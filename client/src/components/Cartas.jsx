@@ -13,7 +13,8 @@ const Cartas = ({ user }) => {
   // 1. DEFINIR A FUNÇÃO PRIMEIRO
   const carregarCartas = async () => {
     try {
-      const res = await axios.get('http://localhost:3001/api/cartas');
+      // CORREÇÃO: Caminho relativo /api
+      const res = await axios.get('/api/cartas');
       if (res.data.success) setCartas(res.data.data);
     } catch (err) { console.error(err); }
   };
@@ -28,7 +29,8 @@ const Cartas = ({ user }) => {
     setLendo(carta);
     if (!carta.foi_lida) {
       try {
-        await axios.put(`http://localhost:3001/api/cartas/${carta.id}/ler`);
+        // CORREÇÃO: Caminho relativo /api
+        await axios.put(`/api/cartas/${carta.id}/ler`);
         // Atualiza localmente
         const novaLista = cartas.map(c => c.id === carta.id ? {...c, foi_lida: true} : c);
         setCartas(novaLista);
@@ -39,7 +41,8 @@ const Cartas = ({ user }) => {
   const enviarCarta = async () => {
     if (!novoTitulo || !novoConteudo) return alert('Escreva algo!');
     try {
-      await axios.post('http://localhost:3001/api/cartas', {
+      // CORREÇÃO: Caminho relativo /api
+      await axios.post('/api/cartas', {
         titulo: novoTitulo,
         conteudo: novoConteudo
       });
@@ -48,7 +51,6 @@ const Cartas = ({ user }) => {
       setNovoConteudo('');
       carregarCartas();
     } catch (err) { 
-      // AQUI ESTAVA O ERRO: Agora usamos o 'err'
       console.error(err); 
       alert('Erro ao enviar'); 
     }
