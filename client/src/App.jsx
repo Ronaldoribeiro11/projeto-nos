@@ -114,7 +114,7 @@ function App() {
   );
 }
 
-// --- HOME CONTENT ---
+
 const HomeContent = () => {
     const [tempo, setTempo] = useState({ anos:0, meses:0, semanas:0, dias:0, horas:0, minutos:0, segundos:0 });
     const [bio, setBio] = useState({ sangue:0, celulas:0 });
