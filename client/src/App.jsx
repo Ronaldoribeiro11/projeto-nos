@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-// Mantemos axios para os outros apps (Jardim, etc)
+// import axios from 'axios'; // Desativado para o Login Local
 import Pulso from './components/Pulso';
 import MenuApps from './components/MenuApps'; 
 
@@ -14,17 +14,16 @@ import Cofre from './components/Cofre';
 import Metas from './components/Metas';
 import Galeria from './components/Galeria';
 import Gacha from './components/Gacha';
-import Arcade from './components/Arcade';
+// REMOVI O IMPORT DO ARCADE AQUI!
 
 function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState('home'); 
   
-  // --- LÓGICA DE LOGIN GARANTIDA (SEM SERVIDOR) ---
+  // --- LÓGICA DE LOGIN LOCAL ---
   useEffect(() => {
     const realizarLogin = () => {
-        // 1. Verifica se já tem login salvo no navegador
         const usuarioSalvo = localStorage.getItem('usuario_nos');
         if (usuarioSalvo) {
             setUser(JSON.parse(usuarioSalvo));
@@ -32,24 +31,18 @@ function App() {
             return;
         }
 
-        // 2. Verifica a chave na URL LOCALMENTE
         const params = new URLSearchParams(window.location.search);
         const chaveUrl = params.get('chave');
 
-        // SE A CHAVE FOR "amor", ENTRA DIRETO!
         if (chaveUrl === 'amor') {
-            // Criamos o usuário manualmente, ignorando o servidor
             const usuarioEla = { 
                 id: 1, 
                 nome: 'Ela', 
-                papel: 'user',
+                papel: 'user', 
                 magic_code: 'amor'
             };
-            
             localStorage.setItem('usuario_nos', JSON.stringify(usuarioEla));
             setUser(usuarioEla);
-            
-            // Limpa a URL para ficar bonito
             window.history.replaceState({}, document.title, "/");
         }
         
@@ -59,18 +52,15 @@ function App() {
     realizarLogin();
   }, []);
 
-  // Telas de Carregamento e Bloqueio
   if (loading) return <div className="min-h-screen bg-yami-dark flex items-center justify-center animate-pulse text-kawaii-pink">❤️ Verificando...</div>;
   
   if (!user) return (
     <div className="min-h-screen bg-yami-dark flex flex-col items-center justify-center text-white space-y-4">
         <div className="text-6xl animate-bounce">🔒</div>
         <p className="text-gray-400 text-sm">Acesso Restrito</p>
-        <p className="text-xs text-gray-600">Use o link correto com a chave.</p>
     </div>
   );
 
-  // --- ÁREA LOGADA ---
   return (
     <div className="min-h-screen bg-yami-dark text-white relative overflow-hidden font-body flex justify-center">
       
@@ -87,14 +77,13 @@ function App() {
           <div className="w-10 h-10 rounded-full border-2 border-kawaii-purple flex items-center justify-center bg-black/40 shadow-lg">👾</div>
         </header>
 
-        {/* ÁREA PRINCIPAL (GERENCIADOR DE TELAS) */}
+        {/* ÁREA PRINCIPAL */}
         <main className="flex-1 overflow-hidden relative">
             
-            {/* 1. HOME E MENU */}
             {tab === 'home' && <HomeContent />}
             {tab === 'menu' && <MenuApps setTab={setTab} />}
             
-            {/* 2. FUNCIONALIDADES */}
+            {/* FUNCIONALIDADES */}
             {tab === 'jardim' && <Jardim user={user} />}
             {tab === 'saude' && <Saude user={user} />}
             {tab === 'cartas' && <Cartas user={user} />}
@@ -104,14 +93,14 @@ function App() {
             {tab === 'metas' && <Metas user={user} />}
             {tab === 'fotos' && <Galeria user={user} />}
             {tab === 'gacha' && <Gacha user={user} />}
-            {tab === 'arcade' && <Arcade user={user} />}
             
-            {/* 3. SEGURANÇA */}
+            {/* REMOVI O COMPONENTE <Arcade /> DAQUI TAMBÉM! */}
+            
             {tab === 'sos' && <SalaPanico />}
 
         </main>
 
-        {/* RODAPÉ SIMPLIFICADO */}
+        {/* RODAPÉ */}
         <footer className="p-6 pt-2 shrink-0">
             <div className="bg-yami-gray/90 backdrop-blur-xl rounded-2xl p-2 border border-white/10 shadow-2xl flex justify-around items-center">
                 <button onClick={() => setTab('menu')} className={`p-3 text-2xl transition hover:scale-110 ${tab === 'menu' ? 'text-kawaii-purple scale-110' : 'text-gray-400'}`}>📱</button>
