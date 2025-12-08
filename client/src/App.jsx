@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios'; // Mantemos axios para os outros apps (Jardim, etc)
+// Mantemos axios para os outros apps (Jardim, etc)
 import Pulso from './components/Pulso';
 import MenuApps from './components/MenuApps'; 
 
