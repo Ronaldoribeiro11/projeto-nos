@@ -14,7 +14,7 @@ import Cofre from './components/Cofre';
 import Metas from './components/Metas';
 import Galeria from './components/Galeria';
 import Gacha from './components/Gacha';
-// REMOVI O IMPORT DO ARCADE AQUI!
+// REMOVIDO: import Arcade from './components/Arcade';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -34,6 +34,7 @@ function App() {
         const params = new URLSearchParams(window.location.search);
         const chaveUrl = params.get('chave');
 
+        // 1. LOGIN DELA (Usuário Comum)
         if (chaveUrl === 'amor') {
             const usuarioEla = { 
                 id: 1, 
@@ -43,6 +44,18 @@ function App() {
             };
             localStorage.setItem('usuario_nos', JSON.stringify(usuarioEla));
             setUser(usuarioEla);
+            window.history.replaceState({}, document.title, "/");
+        } 
+        // 2. SEU LOGIN (Administrador)
+        else if (chaveUrl === 'admin') { // <--- SUA CHAVE MESTRA AQUI
+            const usuarioEle = { 
+                id: 2, 
+                nome: 'Ele', 
+                papel: 'admin', // Isso libera os botões de escrever carta e editar metas
+                magic_code: 'admin'
+            };
+            localStorage.setItem('usuario_nos', JSON.stringify(usuarioEle));
+            setUser(usuarioEle);
             window.history.replaceState({}, document.title, "/");
         }
         
@@ -114,7 +127,7 @@ function App() {
   );
 }
 
-
+// --- HOME CONTENT ---
 const HomeContent = () => {
     const [tempo, setTempo] = useState({ anos:0, meses:0, semanas:0, dias:0, horas:0, minutos:0, segundos:0 });
     const [bio, setBio] = useState({ sangue:0, celulas:0 });
