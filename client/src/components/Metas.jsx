@@ -1,28 +1,26 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 
-const Metas = ({ user }) => {
+const Metas = () => {
   const [metas, setMetas] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [editando, setEditando] = useState(null); // Para o Admin mudar status
+  const [editando, setEditando] = useState(null); 
 
-  // 1. DEFINIR A FUNÇÃO PRIMEIRO
-  const carregarMapa = async () => {
+  // 1. Carregar Dados (Com useCallback para evitar loops e erros no console)
+  const carregarMapa = useCallback(async () => {
     try {
-      // CORREÇÃO: Caminho relativo /api
+      // CORREÇÃO: Caminho relativo /api (Essencial para funcionar na Vercel)
       const res = await axios.get('/api/metas');
       if (res.data.success) setMetas(res.data.data);
     } catch (error) { 
       console.error(error); 
     }
     setLoading(false); 
-  };
+  }, []);
 
-  // 2. CHAMAR A FUNÇÃO DEPOIS
   useEffect(() => {
     carregarMapa();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [carregarMapa]);
 
   const mudarStatus = async (id, novoStatus) => {
     try {
@@ -54,9 +52,9 @@ const Metas = ({ user }) => {
 
   // Ícones por status
   const getIcone = (status) => {
-    if (status === 'concluido') return '🚩'; // Bandeira
-    if (status === 'andamento') return '🏃'; // Correndo
-    return '🔒'; // Cadeado
+    if (status === 'concluido') return '🚩'; 
+    if (status === 'andamento') return '🏃'; 
+    return '🔒'; 
   };
 
   // Cor por status
@@ -66,7 +64,6 @@ const Metas = ({ user }) => {
     return 'bg-gray-700 border-gray-600 text-gray-400 grayscale';
   };
 
-  // 3. TELA DE CARREGAMENTO
   if (loading) {
     return (
         <div className="w-full h-full flex items-center justify-center text-blue-400 animate-pulse">
@@ -82,17 +79,15 @@ const Metas = ({ user }) => {
       </h2>
       <p className="text-center text-xs text-gray-500 mb-8">Nossa jornada, fase por fase.</p>
 
-      {/* ADMIN: Botão de adicionar */}
-      {user.papel === 'admin' && (
-        <button onClick={novaMeta} className="absolute top-4 right-4 text-xs bg-blue-500/20 text-blue-400 px-2 py-1 rounded border border-blue-500/50">
-          + Fase
-        </button>
-      )}
+      {/* BOTÃO ADICIONAR (LIBERADO PARA TODOS) */}
+      <button onClick={novaMeta} className="absolute top-4 right-4 text-xs bg-blue-500/20 text-blue-400 px-2 py-1 rounded border border-blue-500/50 hover:bg-blue-500/40 transition">
+        + Fase
+      </button>
 
       {/* O MAPA */}
       <div className="relative flex flex-col items-center w-full max-w-xs mx-auto pb-20">
         
-        {/* Linha do Caminho (SVG no fundo) */}
+        {/* Linha do Caminho */}
         <svg className="absolute top-4 left-0 w-full h-full pointer-events-none" style={{ zIndex: 0 }}>
             <path 
                 d="M 160 20 Q 250 80 160 140 Q 70 200 160 260 Q 250 320 160 380 Q 70 440 160 500" 
@@ -103,29 +98,25 @@ const Metas = ({ user }) => {
             />
         </svg>
 
-        {/* As Fases (Nodes) */}
         <div className="w-full flex flex-col gap-12 relative z-10 pt-4">
             {metas.map((meta, index) => {
-                // Alterna lados (Zigue-Zague visual)
                 const lado = index % 2 === 0 ? 'self-end mr-10' : 'self-start ml-10';
                 
                 return (
                     <div 
                         key={meta.id} 
-                        onClick={() => user.papel === 'admin' && setEditando(meta)}
+                        onClick={() => setEditando(meta)} /* LIBERADO: Qualquer um clica para editar */
                         className={`flex flex-col items-center ${lado} cursor-pointer group`}
                     >
                         {/* Círculo da Fase */}
                         <div className={`w-16 h-16 rounded-full border-4 flex items-center justify-center text-2xl shadow-xl transition-all duration-300 relative ${getCor(meta.status)}`}>
                             {getIcone(meta.status)}
                             
-                            {/* Número da Fase */}
                             <span className="absolute -top-2 -right-2 bg-black text-white text-[9px] w-5 h-5 rounded-full flex items-center justify-center border border-white">
                                 {index + 1}
                             </span>
                         </div>
 
-                        {/* Placa com Nome */}
                         <div className="mt-2 bg-black/80 backdrop-blur-sm px-3 py-1 rounded-lg border border-white/10 text-center">
                             <span className="text-xs font-bold text-gray-200">{meta.titulo}</span>
                         </div>
@@ -135,7 +126,7 @@ const Metas = ({ user }) => {
         </div>
       </div>
 
-      {/* MODAL DE EDIÇÃO (ADMIN) */}
+      {/* MODAL DE EDIÇÃO */}
       {editando && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
             <div className="bg-gray-900 border border-gray-700 p-6 rounded-xl w-full max-w-sm text-center">
