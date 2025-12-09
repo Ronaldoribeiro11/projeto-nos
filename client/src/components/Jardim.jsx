@@ -19,8 +19,10 @@ const Jardim = ({ user }) => {
   // 1. Função de carregar (definida antes de usar)
   const carregarJardim = async () => {
     try {
-      // CORREÇÃO: Usar caminho relativo /api (O Vercel manda pro Render)
-      const res = await axios.get(`/api/diario/${user.id}`);
+      // CORREÇÃO:
+      // 1. Removemos o localhost (usa o proxy agora)
+      // 2. Mudamos para '/api/jardim' (que é a rota correta de leitura no seu backend)
+      const res = await axios.get('/api/jardim');
       if (res.data.success) setHistorico(res.data.data);
     } catch (error) {
       console.error("Erro ao carregar jardim:", error);
@@ -37,7 +39,7 @@ const Jardim = ({ user }) => {
     if (!humor) return alert('Escolha como se sente!');
     setLoading(true);
     try {
-      // CORREÇÃO: Usar caminho relativo /api
+      // CORREÇÃO: Caminho relativo para salvar (/api/diario está correto para POST)
       await axios.post('/api/diario', {
         usuario_id: user.id,
         humor,
